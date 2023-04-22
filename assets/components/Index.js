@@ -5,10 +5,9 @@ const Index = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchMovies = () => {
+  const fetchMovies = (field = '', genre = '') => {
     setLoading(true);
-
-    return fetch('/api/movies')
+    return fetch('/api/movies' + '?' + field + '&genre=' + genre)
       .then(response => response.json())
       .then(data => {
         setMovies(data.movies);
@@ -22,7 +21,7 @@ const Index = props => {
 
   return (
     <Layout>
-      <Heading />
+      <Heading onOrderClick={(field, genre) => fetchMovies(field, genre)} />
 
       <MovieList loading={loading}>
         {movies.map((item, key) => (
@@ -43,7 +42,11 @@ const Layout = props => {
   );
 };
 
-const Heading = props => {
+const Heading = ({ onOrderClick }) => {
+  const onFilterClick = event => {
+    console.log(event.target.value);
+    onOrderClick('rating', event.target.value)
+  }
   return (
     <div className="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
       <h1 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
@@ -53,6 +56,30 @@ const Heading = props => {
       <p className="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400">
         Explore the whole collection of movies
       </p>
+      {/* <a href="?rating">Ordina per rating</a> */}
+
+      <Button onClick={() => onOrderClick('rating')}>Ordina per rating</Button>
+      <Button onClick={() => onOrderClick('')}>Ordina per data di uscita</Button>
+
+      <select onChange={onFilterClick}>
+      <option value="Action">Azione</option>
+      <option value="Adventure">Avventura</option>
+      <option value="Animation">Animazione</option>
+      <option value="Comedy">Commedia</option>
+      <option value="Crime">Crimine</option>
+      <option value="Drama">Dramma</option>
+      <option value="Family">Famiglia</option>
+      <option value="Fantasy">Fantasia</option>
+      <option value="History">Storia</option>
+      <option value="Horror">Orrore</option>
+      <option value="Music">Musica</option>
+      <option value="Mystery">Mistero</option>
+      <option value="Romance">Romanza</option>
+      <option value="Sci-Fi">Fantascienza</option>
+      <option value="Sport">Sport</option>
+      <option value="Thriller">Romanzo</option>
+      <option value="War">Guerra</option>
+      </select>
     </div>
   );
 };
