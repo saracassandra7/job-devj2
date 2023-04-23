@@ -5,9 +5,9 @@ const Index = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchMovies = (field = '', genre = '') => {
+  const fetchMovies = (field = '') => {
     setLoading(true);
-    return fetch('/api/movies' + '?' + field + '&genre=' + genre)
+    return fetch('/api/movies' + '?' + field)
       .then(response => response.json())
       .then(data => {
         setMovies(data.movies);
@@ -21,9 +21,10 @@ const Index = props => {
 
   return (
     <Layout>
-      <Heading onOrderClick={(field, genre) => fetchMovies(field, genre)} />
+      <Heading onOrderClick={(field) => fetchMovies(field)} />
+      <MoviesForm />
 
-      <MovieList loading={loading}>
+      <MovieList loading={loading} movies={movies}>
         {movies.map((item, key) => (
           <MovieItem key={key} {...item} />
         ))}
@@ -31,6 +32,97 @@ const Index = props => {
     </Layout>
   );
 };
+
+const MoviesForm = props => {
+  const [selectValue, setSelectValue] = useState('');
+  const [movies, setMovies] = useState([]);
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  
+    // Imposta la variabile di stato 'loading' su true per mostrare uno spinner
+    setLoading(true);
+  
+    // Crea un oggetto FormData con il valore selezionato nella select
+    const formData = new FormData();
+    formData.append('genres_select', selectValue);
+  
+    // Invia i dati al controller tramite richiesta Fetch
+    fetch('/api/genres', {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Errore nella richiesta');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Imposta i dati della risposta nello stato
+      setResponseData(data);
+
+      setMovies(data.movies);
+      setLoading(false); // Imposta la variabile di stato 'loading' su false per nascondere lo spinner
+    })
+    .catch(error => {
+      console.log(error);
+      setLoading(false); // Imposta la variabile di stato 'loading' su false per nascondere lo spinner
+    });
+  };
+
+
+  const handleSelectChange = (event) => {
+    setSelectValue(event.target.value);
+  };
+
+  return (
+    <div>
+      <h3>Ordina per genere</h3>
+      <form onSubmit={handleSubmit} className='my-5'>
+      <select name="genres_select" value={selectValue} onChange={handleSelectChange}>
+      <option value="">Seleziona genere</option>
+      <option value="Action">Azione</option>
+      <option value="Adventure">Avventura</option>
+      <option value="Animation">Animazione</option>
+      <option value="Comedy">Commedia</option>
+      <option value="Crime">Crimine</option>
+      <option value="Drama">Drammatico</option>
+      <option value="Family">Famiglia</option>
+      <option value="Fantasy">Fantasia</option>
+      <option value="History">Storia</option>
+      <option value="Horror">Orrore</option>
+      <option value="Music">Musica</option>
+      <option value="Mystery">Mistero</option>
+      <option value="Romance">Romanzo</option>
+      <option value="Sci-Fi">Fantascienza</option>
+      <option value="Sport">Sport</option>
+      <option value="Thriller">Thriller</option>
+      <option value="War">Guerra</option>
+      </select>
+      <button type="submit" className='ml-2 border p-3'>Invia</button>
+    </form>
+    
+
+    {loading &&
+        <div>Sto caricando...</div>
+      }
+
+
+    {responseData &&
+        <div>
+          <p>Ecco i film di questi genere:</p>
+          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+          <MovieList movies={movies} />
+        </div>
+      }
+    </div>
+
+    
+  );
+}
 
 const Layout = props => {
   return (
@@ -56,30 +148,9 @@ const Heading = ({ onOrderClick }) => {
       <p className="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400">
         Explore the whole collection of movies
       </p>
-      {/* <a href="?rating">Ordina per rating</a> */}
-
-      <Button onClick={() => onOrderClick('rating')}>Ordina per rating</Button>
-      <Button onClick={() => onOrderClick('')}>Ordina per data di uscita</Button>
-
-      <select onChange={onFilterClick}>
-      <option value="Action">Azione</option>
-      <option value="Adventure">Avventura</option>
-      <option value="Animation">Animazione</option>
-      <option value="Comedy">Commedia</option>
-      <option value="Crime">Crimine</option>
-      <option value="Drama">Dramma</option>
-      <option value="Family">Famiglia</option>
-      <option value="Fantasy">Fantasia</option>
-      <option value="History">Storia</option>
-      <option value="Horror">Orrore</option>
-      <option value="Music">Musica</option>
-      <option value="Mystery">Mistero</option>
-      <option value="Romance">Romanza</option>
-      <option value="Sci-Fi">Fantascienza</option>
-      <option value="Sport">Sport</option>
-      <option value="Thriller">Romanzo</option>
-      <option value="War">Guerra</option>
-      </select>
+      
+      <Button className='my-8' onClick={() => onOrderClick('rating')}>Ordina per rating</Button>
+      <Button onClick={() => onOrderClick('')}>Ordina per più recenti</Button>
     </div>
   );
 };
