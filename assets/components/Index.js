@@ -29,7 +29,7 @@ const Index = props => {
           <MovieItem key={key} {...item} />
         ))}
       </MovieList>
-    </Layout>
+    </Layout> 
   );
 };
 
@@ -61,18 +61,15 @@ const MoviesForm = props => {
       return response.json();
     })
     .then(data => {
-      // Imposta i dati della risposta nello stato
       setResponseData(data);
-
       setMovies(data.movies);
-      setLoading(false); // Imposta la variabile di stato 'loading' su false per nascondere lo spinner
+      setLoading(false);
     })
     .catch(error => {
       console.log(error);
-      setLoading(false); // Imposta la variabile di stato 'loading' su false per nascondere lo spinner
+      setLoading(false);
     });
   };
-
 
   const handleSelectChange = (event) => {
     setSelectValue(event.target.value);
@@ -81,7 +78,7 @@ const MoviesForm = props => {
   return (
     <div>
       <h3>Ordina per genere</h3>
-      <form onSubmit={handleSubmit} className='my-5'>
+      <form onSubmit={handleSubmit} className='mb-5 mt-2'>
       <select name="genres_select" value={selectValue} onChange={handleSelectChange}>
       <option value="">Seleziona genere</option>
       <option value="Action">Azione</option>

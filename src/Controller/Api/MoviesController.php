@@ -23,7 +23,7 @@ class MoviesController extends AbstractController
             ->select("m.*")
             ->from("movies", "m")
             ->orderBy($orderBy, "DESC")
-            ->setMaxResults(5)
+            ->setMaxResults(50)
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -45,7 +45,7 @@ class MoviesController extends AbstractController
             ->join("m", "movies_genres", "mg", "m.id = mg.movie_id")
             ->where("mg.genre_id = :genre_id")
 
-            ->setMaxResults(5)
+            ->setMaxResults(50)
             ->setParameter('genre_id', $genreId)
             ->executeQuery()
             ->fetchAllAssociative();
